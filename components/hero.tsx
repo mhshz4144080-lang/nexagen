@@ -16,10 +16,11 @@ export function Hero() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left side - Text */}
           <div className="text-left space-y-6">
-            <h1 className="text-5xl md:text-7xl font-black leading-tight text-white uppercase tracking-wide">
+            <h1 className="text-4xl md:text-5xl font-black leading-tight text-white uppercase tracking-wide">
               WELCOME TO<br />
               <span className="text-white">NEXA</span>
-              <span className="text-red-600">GEN</span>
+              <span className="text-red-600">GEN</span><br />
+              <span className="text-red-600">MARKETING</span>
             </h1>
             
             <div className="h-1 w-24 bg-red-600"></div>
@@ -47,11 +48,14 @@ export function Hero() {
           {/* Right side - Logo/Badge */}
           <div className="flex justify-center items-center">
             <div className="text-center space-y-4 bg-white/10 backdrop-blur-lg p-12 rounded-3xl border-2 border-white/20 shadow-2xl">
-              <div className="text-6xl mb-4">�</div>
+              {/* <div className="text-6xl mb-4">🚀</div> */}
               <h2 className="text-4xl font-black text-white">
                 <span className="text-white">NEXA</span>
                 <span className="text-red-600">GEN</span>
               </h2>
+              <h3 className="text-3xl font-black text-red-600">
+                MARKETING
+              </h3>
               <p className="text-blue-400 text-lg font-bold uppercase tracking-wider">
                 YOUR SUCCESS OUR PRIORITY
               </p>
