@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { MVAForm } from './mva-form';
+import { useRouter } from 'next/navigation';
 
 const services = [
   {
@@ -43,19 +42,16 @@ const services = [
 ];
 
 export function Services() {
-  const [showMVAForm, setShowMVAForm] = useState(false);
+  const router = useRouter();
 
   const handleServiceClick = (index: number) => {
     if (index === 0) { // MVA service
-      setShowMVAForm(true);
+      router.push('/mva');
     }
   };
 
   return (
-    <>
-      {showMVAForm && <MVAForm onClose={() => setShowMVAForm(false)} />}
-      
-      <section id="services" className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
+    <section id="services" className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 left-0 w-full h-full opacity-5">
         <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500 rounded-full blur-3xl"></div>
@@ -110,6 +106,5 @@ export function Services() {
         </div>
       </div>
     </section>
-    </>
   );
 }

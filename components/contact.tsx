@@ -193,8 +193,8 @@ export function Contact() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-100 mb-1">Email</p>
-                    <a href="mailto:nexagenmarketing@info.com" className="text-lg font-semibold hover:text-gray-100 transition-colors break-all">
-                      nexagenmarketing@info.com
+                    <a href="mailto:connect@nexagenmarketing.com" className="text-lg font-semibold hover:text-gray-100 transition-colors break-all">
+                      connect@nexagenmarketing.com
                     </a>
                   </div>
                 </div>

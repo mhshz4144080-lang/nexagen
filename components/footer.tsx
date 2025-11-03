@@ -87,8 +87,8 @@ export function Footer() {
               </li>
               <li className="flex items-start">
                 <span className="mr-2">✉️</span>
-                <a href="mailto:nexagenmarketing@info.com" className="hover:text-white transition-colors break-all">
-                  nexagenmarketing@info.com
+                <a href="mailto:connect@nexagenmarketing.com" className="hover:text-white transition-colors break-all">
+                  connect@nexagenmarketing.com
                 </a>
               </li>
               <li className="flex items-start">
