@@ -53,9 +53,12 @@ export default function IntroPage() {
         <div className="mb-12 animate-fadeIn">
           <div className="inline-block">
             <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tight">
-              <span className="text-white drop-shadow-2xl">Nexa</span>
-              <span className="text-red-600 drop-shadow-2xl">BPO</span>
+              <span className="text-white drop-shadow-2xl">NEXA</span>
+              <span className="text-red-600 drop-shadow-2xl">GEN</span>
             </h1>
+            <h2 className="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+              <span className="text-red-600 drop-shadow-2xl">MARKETING</span>
+            </h2>
             <div className="h-1 w-full bg-gradient-to-r from-transparent via-red-600 to-transparent mb-4"></div>
             <p className="text-blue-400 text-xl md:text-2xl font-bold uppercase tracking-[0.3em] animate-pulse">
               Your Success Our Priority

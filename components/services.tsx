@@ -1,8 +1,13 @@
+'use client';
+
+import { useState } from 'react';
+import { MVAForm } from './mva-form';
+
 const services = [
   {
     title: "Motor Vehicle Accident (MVA)",
     description: "Motor Vehicle Accidents can be a traumatic and life-changing experience. We provide comprehensive support for MVA claims, helping you navigate the complex process with ease.",
-    icon: "�",
+    icon: "🚨",
     gradient: "from-red-400 to-pink-500"
   },
   {
@@ -38,8 +43,19 @@ const services = [
 ];
 
 export function Services() {
+  const [showMVAForm, setShowMVAForm] = useState(false);
+
+  const handleServiceClick = (index: number) => {
+    if (index === 0) { // MVA service
+      setShowMVAForm(true);
+    }
+  };
+
   return (
-    <section id="services" className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
+    <>
+      {showMVAForm && <MVAForm onClose={() => setShowMVAForm(false)} />}
+      
+      <section id="services" className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 left-0 w-full h-full opacity-5">
         <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500 rounded-full blur-3xl"></div>
@@ -63,13 +79,14 @@ export function Services() {
           {services.map((service, index) => (
             <div
               key={index}
-              className="group relative bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-transparent overflow-hidden"
+              onClick={() => handleServiceClick(index)}
+              className="group relative bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-transparent overflow-hidden cursor-pointer"
             >
               {/* Gradient overlay on hover */}
               <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
               
               {/* Icon with gradient background */}
-              <div className={`relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${service.gradient} rounded-2xl mb-6 text-3xl shadow-lg transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+              <div className={`relative inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br ${service.gradient} rounded-2xl mb-6 text-4xl shadow-lg transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                 {service.icon}
               </div>
               
@@ -93,5 +110,6 @@ export function Services() {
         </div>
       </div>
     </section>
+    </>
   );
 }
