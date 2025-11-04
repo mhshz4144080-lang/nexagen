@@ -176,36 +176,36 @@ export function Contact() {
               
               <div className="space-y-6">
                 <div className="flex items-start group">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                    <span className="text-2xl">📞</span>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <span className="text-xl sm:text-2xl">📞</span>
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-blue-100 mb-1">Phone</p>
-                    <a href="tel:+92-115916860" className="text-lg font-semibold hover:text-blue-100 transition-colors">
-                      +92-115916860
+                    <a href="tel:+92-464717271" className="text-sm sm:text-base md:text-lg font-semibold hover:text-blue-100 transition-colors break-words block">
+                      +92-464717271
                     </a>
                   </div>
                 </div>
                 
                 <div className="flex items-start group">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                    <span className="text-2xl">✉️</span>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <span className="text-xl sm:text-2xl">✉️</span>
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-100 mb-1">Email</p>
-                    <a href="mailto:connect@nexagenmarketing.com" className="text-lg font-semibold hover:text-gray-100 transition-colors break-all">
+                    <a href="mailto:connect@nexagenmarketing.com" className="text-xs sm:text-base md:text-lg font-semibold hover:text-gray-100 transition-colors block" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                       connect@nexagenmarketing.com
                     </a>
                   </div>
                 </div>
                 
                 <div className="flex items-start group">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                    <span className="text-2xl">📍</span>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <span className="text-xl sm:text-2xl">📍</span>
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-blue-100 mb-1">Address</p>
-                    <p className="text-lg font-semibold">
+                    <p className="text-sm sm:text-base md:text-lg font-semibold leading-relaxed">
                       Office-s56, Second floor,<br />
                       Gold Point near Waris khan,<br />
                       Murree Road
