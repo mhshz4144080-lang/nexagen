@@ -250,13 +250,14 @@ Submitted via NexaGen WeCallPro Lead Form
                 {/* Trusted Form URL */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Trusted Form URL from Website
+                    Trusted Form URL from Website <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
                     name="trusted_form_cert_url"
                     value={formData.trusted_form_cert_url}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                     placeholder="https://..."
                   />
@@ -265,13 +266,14 @@ Submitted via NexaGen WeCallPro Lead Form
                 {/* Currently Represented */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Already Represented?
+                    Already Represented? <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
                     name="currently_represented"
                     value={formData.currently_represented}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                     placeholder="Yes / No / etc."
                   />
@@ -281,26 +283,28 @@ Submitted via NexaGen WeCallPro Lead Form
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Person at Fault
+                      Person at Fault <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="person_at_fault"
                       value={formData.person_at_fault}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="Example"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Claimant Relationship
+                      Claimant Relationship <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="claimantrelationship"
                       value={formData.claimantrelationship}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="Example"
                     />
@@ -311,26 +315,28 @@ Submitted via NexaGen WeCallPro Lead Form
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Incident State
+                      Incident State <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="incidentstate"
                       value={formData.incidentstate}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="Example"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Incident Date
+                      Incident Date <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="incident_date"
                       value={formData.incident_date}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="YYYY-MM-DD or as required"
                     />
@@ -341,26 +347,28 @@ Submitted via NexaGen WeCallPro Lead Form
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Incident Position
+                      Incident Position <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="incidentposition"
                       value={formData.incidentposition}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="Example"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Cited
+                      Cited <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="cited"
                       value={formData.cited}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="Example"
                     />
@@ -371,26 +379,28 @@ Submitted via NexaGen WeCallPro Lead Form
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Change Attorney
+                      Change Attorney <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="changeattorney"
                       value={formData.changeattorney}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="Example"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Settlement
+                      Settlement <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       name="settlement"
                       value={formData.settlement}
                       onChange={handleChange}
+                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                       placeholder="Example"
                     />
@@ -400,13 +410,14 @@ Submitted via NexaGen WeCallPro Lead Form
                 {/* Channel */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Channel
+                    Channel <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
                     name="channel"
                     value={formData.channel}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
                     placeholder="Example"
                   />

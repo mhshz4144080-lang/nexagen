@@ -238,7 +238,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
               {/* Trusted Form URL */}
               <div>
                 <label htmlFor="trusted_form_cert_url" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Trusted Form URL from Website
+                  Trusted Form URL from Website <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -246,6 +246,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
                   name="trusted_form_cert_url"
                   value={formData.trusted_form_cert_url}
                   onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                   placeholder="https://..."
                 />
@@ -254,7 +255,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
               {/* Currently Represented */}
               <div>
                 <label htmlFor="currently_represented" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Already Represented?
+                  Already Represented? <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -262,6 +263,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
                   name="currently_represented"
                   value={formData.currently_represented}
                   onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                   placeholder="Yes / No / etc."
                 />
@@ -271,7 +273,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="person_at_fault" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Person at Fault
+                    Person at Fault <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -279,13 +281,14 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="person_at_fault"
                     value={formData.person_at_fault}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="Example"
                   />
                 </div>
                 <div>
                   <label htmlFor="claimantrelationship" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Claimant Relationship
+                    Claimant Relationship <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -293,6 +296,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="claimantrelationship"
                     value={formData.claimantrelationship}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="Example"
                   />
@@ -303,7 +307,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="incidentstate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Incident State
+                    Incident State <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -311,13 +315,14 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="incidentstate"
                     value={formData.incidentstate}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="Example"
                   />
                 </div>
                 <div>
                   <label htmlFor="incident_date" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Incident Date
+                    Incident Date <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -325,6 +330,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="incident_date"
                     value={formData.incident_date}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="YYYY-MM-DD or as required"
                   />
@@ -335,7 +341,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="incidentposition" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Incident Position
+                    Incident Position <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -343,13 +349,14 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="incidentposition"
                     value={formData.incidentposition}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="Example"
                   />
                 </div>
                 <div>
                   <label htmlFor="cited" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Cited
+                    Cited <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -357,6 +364,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="cited"
                     value={formData.cited}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="Example"
                   />
@@ -367,7 +375,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="changeattorney" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Change Attorney
+                    Change Attorney <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -375,13 +383,14 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="changeattorney"
                     value={formData.changeattorney}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="Example"
                   />
                 </div>
                 <div>
                   <label htmlFor="settlement" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Settlement
+                    Settlement <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -389,6 +398,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
                     name="settlement"
                     value={formData.settlement}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                     placeholder="Example"
                   />
@@ -398,7 +408,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
               {/* Channel */}
               <div>
                 <label htmlFor="channel" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Channel
+                  Channel <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -406,6 +416,7 @@ export function MVAForm({ onClose }: MVAFormProps) {
                   name="channel"
                   value={formData.channel}
                   onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-600 focus:border-transparent transition-all outline-none"
                   placeholder="Example"
                 />
