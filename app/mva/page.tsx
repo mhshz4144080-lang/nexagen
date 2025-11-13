@@ -5,15 +5,21 @@ import Link from "next/link";
 
 export default function MVAPage() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    zipCode: "",
-    accidentDate: "",
-    doctorVisit: "",
-    policeReport: "",
-    hasAttorney: "",
-    description: "",
+    caller_id: '',
+    first_name: '',
+    last_name: '',
+    email: '',
+    trusted_form_cert_url: '',
+    currently_represented: '',
+    person_at_fault: '',
+    claimantrelationship: '',
+    incidentstate: '',
+    incident_date: '',
+    incidentposition: '',
+    cited: '',
+    changeattorney: '',
+    settlement: '',
+    channel: ''
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
@@ -22,31 +28,88 @@ export default function MVAPage() {
     setStatus("loading");
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
+      // First, submit to WeCallPro API
+      const formBody = new URLSearchParams();
+      formBody.append('lead_token', '7d739eaa3ea7488689171a59e62e2707');
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value) formBody.append(key, value);
+      });
+
+      const weCallProResponse = await fetch('https://wecall-pro.trackdrive.com/api/v1/leads', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formBody.toString(),
+      });
+
+      // Then send beautiful confirmation email via Web3Forms
+      const emailResponse = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          access_key: "ece1ba3b-64df-4136-b1b7-f58eeea670c7",
-          subject: "MVA Form Submission - Accident First Help",
-          from_name: "NexaGen MVA Form",
+          access_key: 'ece1ba3b-64df-4136-b1b7-f58eeea670c7',
+          subject: '✅ WeCallPro Lead Submission Confirmation',
+          from_name: 'NexaGen - WeCallPro Lead Form',
           ...formData,
+          message: `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎉 NEW WECALLPRO LEAD SUBMITTED SUCCESSFULLY! 🎉
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 CONTACT INFORMATION
+────────────────────────────────────────────────────
+👤 Name: ${formData.first_name} ${formData.last_name}
+📞 Phone: ${formData.caller_id}
+📧 Email: ${formData.email}
+
+⚖️ CASE DETAILS
+────────────────────────────────────────────────────
+📍 Incident State: ${formData.incidentstate || 'Not provided'}
+📅 Incident Date: ${formData.incident_date || 'Not provided'}
+👥 Claimant Relationship: ${formData.claimantrelationship || 'Not provided'}
+🚦 Incident Position: ${formData.incidentposition || 'Not provided'}
+
+🔍 LEGAL STATUS
+────────────────────────────────────────────────────
+👨‍⚖️ Currently Represented: ${formData.currently_represented || 'Not provided'}
+⚠️ Person at Fault: ${formData.person_at_fault || 'Not provided'}
+📝 Cited: ${formData.cited || 'Not provided'}
+🔄 Change Attorney: ${formData.changeattorney || 'Not provided'}
+💰 Settlement: ${formData.settlement || 'Not provided'}
+
+📡 ADDITIONAL INFO
+────────────────────────────────────────────────────
+📢 Channel: ${formData.channel || 'Not provided'}
+🔗 Trusted Form URL: ${formData.trusted_form_cert_url || 'Not provided'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Submitted via NexaGen WeCallPro Lead Form
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          `
         }),
       });
 
-      if (response.ok) {
+      if (weCallProResponse.ok || emailResponse.ok) {
         setStatus("success");
         setFormData({
-          firstName: "",
-          lastName: "",
-          phone: "",
-          zipCode: "",
-          accidentDate: "",
-          doctorVisit: "",
-          policeReport: "",
-          hasAttorney: "",
-          description: "",
+          caller_id: '',
+          first_name: '',
+          last_name: '',
+          email: '',
+          trusted_form_cert_url: '',
+          currently_represented: '',
+          person_at_fault: '',
+          claimantrelationship: '',
+          incidentstate: '',
+          incident_date: '',
+          incidentposition: '',
+          cited: '',
+          changeattorney: '',
+          settlement: '',
+          channel: ''
         });
         setTimeout(() => setStatus("idle"), 5000);
       } else {
@@ -88,10 +151,10 @@ export default function MVAPage() {
           {/* Header */}
           <div className="bg-gradient-to-r from-red-600 to-pink-600 p-6 md:p-8 text-white">
             <div className="flex items-center gap-3 md:gap-4 mb-4">
-              <div className="text-4xl md:text-5xl">🚨</div>
+              <div className="text-4xl md:text-5xl">�</div>
               <div>
-                <h1 className="text-2xl md:text-4xl font-bold">Accident First Help</h1>
-                <p className="text-red-100 mt-2 text-sm md:text-base">Motor Vehicle Accident Assistance</p>
+                <h1 className="text-2xl md:text-4xl font-bold">WeCallPro Lead Form</h1>
+                <p className="text-red-100 mt-2 text-sm md:text-base">Submit your information and we'll contact you shortly</p>
               </div>
             </div>
           </div>
@@ -99,31 +162,52 @@ export default function MVAPage() {
           {/* Form */}
           <div className="p-6 md:p-8">
             {status === "success" ? (
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
-                  <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center py-12 animate-fadeIn">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full mb-6">
+                  <svg className="w-10 h-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                  Form Submitted Successfully!
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                  Lead Submitted Successfully! 🎉
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Thank you for reaching out. We'll contact you shortly to assist with your claim.
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  Thank you for your submission. We've received your information and will contact you shortly.
                 </p>
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                  <p className="text-blue-800 dark:text-blue-300 text-sm">
+                    ✉️ A confirmation email has been sent to your email address.
+                  </p>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                {/* Caller Number */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Caller Number <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="caller_id"
+                    value={formData.caller_id}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                    placeholder="+17194451111"
+                  />
+                </div>
+
                 {/* Name Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      First Name *
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      First Name <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
-                      name="firstName"
-                      value={formData.firstName}
+                      name="first_name"
+                      value={formData.first_name}
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
@@ -132,145 +216,213 @@ export default function MVAPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Last Name *
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Last Name <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
-                      name="lastName"
-                      value={formData.lastName}
+                      name="last_name"
+                      value={formData.last_name}
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
-                      placeholder="Doe"
+                      placeholder="Smith"
                     />
                   </div>
                 </div>
 
-                {/* Phone & Zip */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
-                      placeholder="+92-XXX-XXXXXXX"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Zip Code *
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={formData.zipCode}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
-                      placeholder="12345"
-                    />
-                  </div>
-                </div>
-
-                {/* Accident Date */}
+                {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Accident Date *
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address <span className="text-red-600">*</span>
                   </label>
                   <input
-                    type="date"
-                    name="accidentDate"
-                    value={formData.accidentDate}
+                    type="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                    placeholder="first-and-last-name@gmail.com"
                   />
                 </div>
 
-                {/* Yes/No Questions */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Doctor Visit? *
-                    </label>
-                    <select
-                      name="doctorVisit"
-                      value={formData.doctorVisit}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
-                    >
-                      <option value="">Select...</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
+                {/* Trusted Form URL */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Trusted Form URL from Website
+                  </label>
+                  <input
+                    type="text"
+                    name="trusted_form_cert_url"
+                    value={formData.trusted_form_cert_url}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                    placeholder="https://..."
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Police Report? *
-                    </label>
-                    <select
-                      name="policeReport"
-                      value={formData.policeReport}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
-                    >
-                      <option value="">Select...</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
+                {/* Currently Represented */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Already Represented?
+                  </label>
+                  <input
+                    type="text"
+                    name="currently_represented"
+                    value={formData.currently_represented}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                    placeholder="Yes / No / etc."
+                  />
+                </div>
 
+                {/* Person at Fault & Claimant Relationship */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Already an Attorney? *
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Person at Fault
                     </label>
-                    <select
-                      name="hasAttorney"
-                      value={formData.hasAttorney}
+                    <input
+                      type="text"
+                      name="person_at_fault"
+                      value={formData.person_at_fault}
                       onChange={handleChange}
-                      required
                       className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
-                    >
-                      <option value="">Select...</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
+                      placeholder="Example"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Claimant Relationship
+                    </label>
+                    <input
+                      type="text"
+                      name="claimantrelationship"
+                      value={formData.claimantrelationship}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                      placeholder="Example"
+                    />
                   </div>
                 </div>
 
-                {/* Description */}
+                {/* Incident State & Date */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Incident State
+                    </label>
+                    <input
+                      type="text"
+                      name="incidentstate"
+                      value={formData.incidentstate}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                      placeholder="Example"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Incident Date
+                    </label>
+                    <input
+                      type="text"
+                      name="incident_date"
+                      value={formData.incident_date}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                      placeholder="YYYY-MM-DD or as required"
+                    />
+                  </div>
+                </div>
+
+                {/* Incident Position & Cited */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Incident Position
+                    </label>
+                    <input
+                      type="text"
+                      name="incidentposition"
+                      value={formData.incidentposition}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                      placeholder="Example"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Cited
+                    </label>
+                    <input
+                      type="text"
+                      name="cited"
+                      value={formData.cited}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                      placeholder="Example"
+                    />
+                  </div>
+                </div>
+
+                {/* Change Attorney & Settlement */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Change Attorney
+                    </label>
+                    <input
+                      type="text"
+                      name="changeattorney"
+                      value={formData.changeattorney}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                      placeholder="Example"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Settlement
+                    </label>
+                    <input
+                      type="text"
+                      name="settlement"
+                      value={formData.settlement}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                      placeholder="Example"
+                    />
+                  </div>
+                </div>
+
+                {/* Channel */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Briefly describe how accident happened? *
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Channel
                   </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
+                  <input
+                    type="text"
+                    name="channel"
+                    value={formData.channel}
                     onChange={handleChange}
-                    required
-                    rows={4}
-                    className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none text-sm md:text-base"
-                    placeholder="Please provide details about the accident..."
-                  ></textarea>
+                    className="w-full px-4 py-2.5 md:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-sm md:text-base"
+                    placeholder="Example"
+                  />
                 </div>
 
                 {/* Error Message */}
                 {status === "error" && (
-                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                    <p className="text-red-700 dark:text-red-300 text-sm md:text-base">
-                      ⚠️ Something went wrong. Please try again.
-                    </p>
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl animate-fadeIn">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-red-700 dark:text-red-300 text-sm md:text-base font-medium">
+                        Something went wrong. Please try again.
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -278,18 +430,18 @@ export default function MVAPage() {
                 <button
                   type="submit"
                   disabled={status === "loading"}
-                  className="w-full px-6 py-3 md:py-4 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 disabled:from-red-400 disabled:to-pink-400 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:cursor-not-allowed disabled:transform-none text-sm md:text-base"
+                  className="w-full px-6 py-4 md:py-5 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 disabled:from-red-400 disabled:to-pink-400 text-white font-bold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:cursor-not-allowed disabled:transform-none text-base md:text-lg"
                 >
                   {status === "loading" ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <span className="flex items-center justify-center gap-3">
+                      <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      Submitting...
+                      Submitting Lead...
                     </span>
                   ) : (
-                    "Submit Application"
+                    "Submit Lead"
                   )}
                 </button>
               </form>
