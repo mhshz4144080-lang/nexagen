@@ -26,10 +26,12 @@ export function MVAForm({ onClose }: MVAFormProps) {
   });
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [apiResponse, setApiResponse] = useState<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setApiResponse(null);
 
     try {
       // First, submit to WeCallPro API
@@ -47,42 +49,62 @@ export function MVAForm({ onClose }: MVAFormProps) {
         body: formBody.toString(),
       });
 
-      // Then send confirmation email via Web3Forms
-      const emailResponse = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          access_key: 'ece1ba3b-64df-4136-b1b7-f58eeea670c7',
-          subject: '✅ WeCallPro Lead Submission Confirmation',
-          from_name: 'NexaGen - WeCallPro Lead Form',
-          ...formData,
-          message: `
-            New WeCallPro Lead Submitted Successfully!
-            
-            Contact Information:
-            - Name: ${formData.first_name} ${formData.last_name}
-            - Phone: ${formData.caller_id}
-            - Email: ${formData.email}
-            
-            Case Details:
-            - Incident State: ${formData.incidentstate}
-            - Incident Date: ${formData.incident_date}
-            - Currently Represented: ${formData.currently_represented}
-            - Person at Fault: ${formData.person_at_fault}
-            - Claimant Relationship: ${formData.claimantrelationship}
-            - Incident Position: ${formData.incidentposition}
-            - Cited: ${formData.cited}
-            - Change Attorney: ${formData.changeattorney}
-            - Settlement: ${formData.settlement}
-            - Channel: ${formData.channel}
-            - Trusted Form URL: ${formData.trusted_form_cert_url}
-          `
-        }),
+      const weCallProData = await weCallProResponse.json();
+      setApiResponse({
+        weCallPro: {
+          status: weCallProResponse.status,
+          statusText: weCallProResponse.statusText,
+          data: weCallProData
+        }
       });
 
-      if (weCallProResponse.ok || emailResponse.ok) {
+      // Only send confirmation email if WeCallPro API returns 200 or 201
+      if (weCallProResponse.status === 200 || weCallProResponse.status === 201) {
+        // Send confirmation email via Web3Forms
+        const emailResponse = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            access_key: 'ece1ba3b-64df-4136-b1b7-f58eeea670c7',
+            subject: '✅ WeCallPro Lead Submission Confirmation',
+            from_name: 'NexaGen - WeCallPro Lead Form',
+            ...formData,
+            message: `
+              New WeCallPro Lead Submitted Successfully!
+              
+              Contact Information:
+              - Name: ${formData.first_name} ${formData.last_name}
+              - Phone: ${formData.caller_id}
+              - Email: ${formData.email}
+              
+              Case Details:
+              - Incident State: ${formData.incidentstate}
+              - Incident Date: ${formData.incident_date}
+              - Currently Represented: ${formData.currently_represented}
+              - Person at Fault: ${formData.person_at_fault}
+              - Claimant Relationship: ${formData.claimantrelationship}
+              - Incident Position: ${formData.incidentposition}
+              - Cited: ${formData.cited}
+              - Change Attorney: ${formData.changeattorney}
+              - Settlement: ${formData.settlement}
+              - Channel: ${formData.channel}
+              - Trusted Form URL: ${formData.trusted_form_cert_url}
+            `
+          }),
+        });
+
+        const emailData = await emailResponse.json();
+        setApiResponse((prev: any) => ({
+          ...prev,
+          email: {
+            status: emailResponse.status,
+            statusText: emailResponse.statusText,
+            data: emailData
+          }
+        }));
+
         setStatus('success');
         setFormData({
           caller_id: '',
@@ -102,15 +124,22 @@ export function MVAForm({ onClose }: MVAFormProps) {
           channel: ''
         });
         
-        // Close form after 3 seconds
+        // Close form after 5 seconds to allow viewing response
         setTimeout(() => {
           onClose();
-        }, 3000);
+        }, 5000);
       } else {
+        // If not 200/201, show error and keep form open with response
         setStatus('error');
       }
     } catch (error) {
       setStatus('error');
+      setApiResponse({
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          details: error
+        }
+      });
     }
   };
 
@@ -159,11 +188,26 @@ export function MVAForm({ onClose }: MVAFormProps) {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Form Submitted Successfully!
+                Lead Submitted Successfully!
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Thank you for reaching out. We'll contact you shortly to assist with your claim.
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Thank you for your submission. We've received your information and sent a confirmation email.
               </p>
+              {apiResponse && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-xl p-4 mt-6 max-w-2xl mx-auto">
+                  <div className="flex items-center gap-2 mb-3">
+                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h4 className="font-bold text-sm text-gray-900 dark:text-white">API Response</h4>
+                  </div>
+                  <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                    <pre className="text-xs overflow-x-auto text-gray-800 dark:text-gray-200 max-h-60 overflow-y-auto font-mono whitespace-pre-wrap break-words">
+                      {JSON.stringify(apiResponse, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -422,17 +466,41 @@ export function MVAForm({ onClose }: MVAFormProps) {
                 />
               </div>
 
+              {/* API Response Display */}
+              {apiResponse && (
+                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl p-4 animate-fadeIn">
+                  <div className="flex items-center gap-2 mb-3">
+                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">API Response</h4>
+                  </div>
+                  <pre className="text-xs bg-white dark:bg-gray-900 p-3 rounded-lg overflow-x-auto text-gray-800 dark:text-gray-200 max-h-60 overflow-y-auto">
+                    {JSON.stringify(apiResponse, null, 2)}
+                  </pre>
+                </div>
+              )}
+
               {/* Error Message */}
               {status === 'error' && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 animate-fadeIn">
-                  <div className="flex items-center">
+                  <div className="flex items-center mb-3">
                     <svg className="w-5 h-5 text-red-600 dark:text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p className="text-red-800 dark:text-red-300 text-sm font-medium">
-                      Something went wrong. Please try again.
+                      {apiResponse?.weCallPro?.data?.response?.result?.[0] === "Source Duplicate" 
+                        ? "Lead creation failed: Duplicate entry detected" 
+                        : "Something went wrong. Please check the response below."}
                     </p>
                   </div>
+                  {apiResponse && (
+                    <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-red-200 dark:border-red-700 mt-3">
+                      <pre className="text-xs overflow-x-auto text-gray-800 dark:text-gray-200 max-h-60 overflow-y-auto font-mono whitespace-pre-wrap break-words">
+                        {JSON.stringify(apiResponse, null, 2)}
+                      </pre>
+                    </div>
+                  )}
                 </div>
               )}
 

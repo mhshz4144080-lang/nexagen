@@ -22,10 +22,12 @@ export default function MVAPage() {
     channel: ''
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [apiResponse, setApiResponse] = useState<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
+    setApiResponse(null);
 
     try {
       // First, submit to WeCallPro API
@@ -43,18 +45,29 @@ export default function MVAPage() {
         body: formBody.toString(),
       });
 
-      // Then send beautiful confirmation email via Web3Forms
-      const emailResponse = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          access_key: 'ece1ba3b-64df-4136-b1b7-f58eeea670c7',
-          subject: '✅ WeCallPro Lead Submission Confirmation',
-          from_name: 'NexaGen - WeCallPro Lead Form',
-          ...formData,
-          message: `
+      const weCallProData = await weCallProResponse.json();
+      setApiResponse({
+        weCallPro: {
+          status: weCallProResponse.status,
+          statusText: weCallProResponse.statusText,
+          data: weCallProData
+        }
+      });
+
+      // Only send confirmation email if WeCallPro API returns 200 or 201
+      if (weCallProResponse.status === 200 || weCallProResponse.status === 201) {
+        // Send beautiful confirmation email via Web3Forms
+        const emailResponse = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            access_key: 'ece1ba3b-64df-4136-b1b7-f58eeea670c7',
+            subject: '✅ WeCallPro Lead Submission Confirmation',
+            from_name: 'NexaGen - WeCallPro Lead Form',
+            ...formData,
+            message: `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎉 NEW WECALLPRO LEAD SUBMITTED SUCCESSFULLY! 🎉
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -89,10 +102,19 @@ export default function MVAPage() {
 Submitted via NexaGen WeCallPro Lead Form
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           `
-        }),
-      });
+          }),
+        });
 
-      if (weCallProResponse.ok || emailResponse.ok) {
+        const emailData = await emailResponse.json();
+        setApiResponse((prev: any) => ({
+          ...prev,
+          email: {
+            status: emailResponse.status,
+            statusText: emailResponse.statusText,
+            data: emailData
+          }
+        }));
+
         setStatus("success");
         setFormData({
           caller_id: '',
@@ -111,15 +133,19 @@ Submitted via NexaGen WeCallPro Lead Form
           settlement: '',
           channel: ''
         });
-        setTimeout(() => setStatus("idle"), 5000);
       } else {
+        // If not 200/201, show error and keep form with data
         setStatus("error");
-        setTimeout(() => setStatus("idle"), 5000);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       setStatus("error");
-      setTimeout(() => setStatus("idle"), 5000);
+      setApiResponse({
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          details: error
+        }
+      });
     }
   };
 
@@ -171,14 +197,32 @@ Submitted via NexaGen WeCallPro Lead Form
                 <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                   Lead Submitted Successfully! 🎉
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
                   Thank you for your submission. We've received your information and will contact you shortly.
                 </p>
-                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 mb-6">
                   <p className="text-blue-800 dark:text-blue-300 text-sm">
                     ✉️ A confirmation email has been sent to your email address.
                   </p>
                 </div>
+                {apiResponse && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-xl p-4 md:p-6 animate-fadeIn max-w-2xl mx-auto">
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <h4 className="font-bold text-lg text-gray-900 dark:text-white">API Response</h4>
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                      <pre className="text-xs md:text-sm overflow-x-auto text-gray-800 dark:text-gray-200 max-h-96 overflow-y-auto font-mono whitespace-pre-wrap break-words">
+                        {JSON.stringify(apiResponse, null, 2)}
+                      </pre>
+                    </div>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-3 text-center">
+                      ℹ️ This response shows the result of your form submission
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
@@ -423,17 +467,46 @@ Submitted via NexaGen WeCallPro Lead Form
                   />
                 </div>
 
+                {/* API Response Display */}
+                {apiResponse && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-xl p-4 md:p-6 animate-fadeIn">
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <h4 className="font-bold text-lg text-gray-900 dark:text-white">API Response</h4>
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                      <pre className="text-xs md:text-sm overflow-x-auto text-gray-800 dark:text-gray-200 max-h-96 overflow-y-auto font-mono whitespace-pre-wrap break-words">
+                        {JSON.stringify(apiResponse, null, 2)}
+                      </pre>
+                    </div>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-3 text-center">
+                      ℹ️ This response shows the result of your form submission
+                    </p>
+                  </div>
+                )}
+
                 {/* Error Message */}
                 {status === "error" && (
                   <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl animate-fadeIn">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-3">
                       <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <p className="text-red-700 dark:text-red-300 text-sm md:text-base font-medium">
-                        Something went wrong. Please try again.
+                        {apiResponse?.weCallPro?.data?.response?.result?.[0] === "Source Duplicate" 
+                          ? "Lead creation failed: Duplicate entry detected" 
+                          : "Something went wrong. Please check the response below."}
                       </p>
                     </div>
+                    {apiResponse && (
+                      <div className="bg-white dark:bg-gray-900 rounded-lg p-3 border border-red-200 dark:border-red-700 mt-3">
+                        <pre className="text-xs md:text-sm overflow-x-auto text-gray-800 dark:text-gray-200 max-h-60 overflow-y-auto font-mono whitespace-pre-wrap break-words">
+                          {JSON.stringify(apiResponse, null, 2)}
+                        </pre>
+                      </div>
+                    )}
                   </div>
                 )}
 
