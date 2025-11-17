@@ -1,10 +1,27 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function MVAPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeForm, setActiveForm] = useState<'form1' | 'form2' | 'form3' | 'form4'>('form1');
+
+  // Initialize form based on URL parameter
+  useEffect(() => {
+    const form = searchParams.get('form');
+    if (form === 'form1' || form === 'form2' || form === 'form3' || form === 'form4') {
+      setActiveForm(form);
+    }
+  }, [searchParams]);
+
+  // Function to change form and update URL
+  const handleFormChange = (form: 'form1' | 'form2' | 'form3' | 'form4') => {
+    setActiveForm(form);
+    router.push(`/mva?form=${form}`, { scroll: false });
+  };
   
   // Form 1 - WeCallPro
   const [formData, setFormData] = useState({
@@ -534,7 +551,7 @@ Submitted via NexaGen Elite-Calls Lead Form 3
           data: eliteCallsData
         }
       });
-        console.log(eliteCallsResponse);
+        //console.log(eliteCallsResponse);
       // Only send confirmation email if Elite-Calls API returns 200 or 201
       if (eliteCallsResponse.status === 200 || eliteCallsResponse.status === 201) {
         // Send beautiful confirmation email via Web3Forms
@@ -668,7 +685,7 @@ Submitted via NexaGen Elite-Calls Lead Form 4
             {/* Tab Navigation */}
             <div className="flex gap-2 mt-6 flex-wrap">
               <button
-                onClick={() => setActiveForm('form1')}
+                onClick={() => handleFormChange('form1')}
                 className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${
                   activeForm === 'form1'
                     ? 'bg-white text-red-600 shadow-lg'
@@ -678,7 +695,7 @@ Submitted via NexaGen Elite-Calls Lead Form 4
                 Form 1: WeCallPro
               </button>
               <button
-                onClick={() => setActiveForm('form2')}
+                onClick={() => handleFormChange('form2')}
                 className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${
                   activeForm === 'form2'
                     ? 'bg-white text-red-600 shadow-lg'
@@ -688,7 +705,7 @@ Submitted via NexaGen Elite-Calls Lead Form 4
                 Form 2: Elite-Calls
               </button>
               <button
-                onClick={() => setActiveForm('form3')}
+                onClick={() => handleFormChange('form3')}
                 className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${
                   activeForm === 'form3'
                     ? 'bg-white text-red-600 shadow-lg'
@@ -698,7 +715,7 @@ Submitted via NexaGen Elite-Calls Lead Form 4
                 Form 3: Elite-Calls
               </button>
               <button
-                onClick={() => setActiveForm('form4')}
+                onClick={() => handleFormChange('form4')}
                 className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${
                   activeForm === 'form4'
                     ? 'bg-white text-red-600 shadow-lg'
