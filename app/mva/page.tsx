@@ -7,18 +7,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 function MVAContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeForm, setActiveForm] = useState<'form1' | 'form2' | 'form3' | 'form4'>('form1');
+  const [activeForm, setActiveForm] = useState<'form1' | 'form2' | 'form3' | 'form4' | 'form5'>('form1');
 
   // Initialize form based on URL parameter
   useEffect(() => {
     const form = searchParams.get('form');
-    if (form === 'form1' || form === 'form2' || form === 'form3' || form === 'form4') {
+    if (form === 'form1' || form === 'form2' || form === 'form3' || form === 'form4' || form === 'form5') {
       setActiveForm(form);
     }
   }, [searchParams]);
 
   // Function to change form and update URL
-  const handleFormChange = (form: 'form1' | 'form2' | 'form3' | 'form4') => {
+  const handleFormChange = (form: 'form1' | 'form2' | 'form3' | 'form4' | 'form5') => {
     setActiveForm(form);
     router.push(`/mva?form=${form}`, { scroll: false });
   };
@@ -109,6 +109,28 @@ function MVAContent() {
   });
   const [status4, setStatus4] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [apiResponse4, setApiResponse4] = useState<any>(null);
+
+  // Form 5 - Elite-Calls (3b0b8194...)
+  const [formData5, setFormData5] = useState({
+    caller_id: '',
+    traffic_source_id: '1084',
+    first_name: '',
+    last_name: '',
+    email: '',
+    trusted_form_cert_url: '',
+    currently_represented: '',
+    person_at_fault: '',
+    claimantrelationship: '',
+    incidentstate: '',
+    incident_date: '',
+    incidentposition: '',
+    settlement: '',
+    channel: '',
+    cited: '',
+    changeattorney: ''
+  });
+  const [status5, setStatus5] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [apiResponse5, setApiResponse5] = useState<any>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -657,6 +679,143 @@ Submitted via NexaGen Elite-Calls Lead Form 4
     });
   };
 
+  // Form 5 Handler
+  const handleSubmit5 = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus5("loading");
+    setApiResponse5(null);
+
+    try {
+      // Submit to WeCallPro API (686ddbfe...)
+      const formBody = new URLSearchParams();
+      formBody.append('lead_token', '686ddbfefecb4cedb0e66a21ac36ab18');
+      Object.entries(formData5).forEach(([key, value]) => {
+        if (value) formBody.append(key, value);
+      });
+
+      const weCallProResponse = await fetch('https://wecall-pro.trackdrive.com/api/v1/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formBody.toString(),
+      });
+
+      const weCallProData = await weCallProResponse.json();
+      
+      setApiResponse5({
+        weCallPro: {
+          status: weCallProResponse.status,
+          statusText: weCallProResponse.statusText,
+          data: weCallProData
+        }
+      });
+
+      // Only send confirmation email if WeCallPro API returns 200 or 201
+      if (weCallProResponse.status === 200 || weCallProResponse.status === 201) {
+        // Send beautiful confirmation email via Web3Forms
+        const emailResponse = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            access_key: 'ece1ba3b-64df-4136-b1b7-f58eeea670c7',
+            subject: '✅ WeCallPro Lead Submission Confirmation (Form 5)',
+            from_name: 'NexaGen - WeCallPro Lead Form 5',
+            ...formData5,
+            message: `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎉 NEW WECALLPRO LEAD SUBMITTED SUCCESSFULLY! 🎉
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 CONTACT INFORMATION
+────────────────────────────────────────────────────
+👤 Name: ${formData5.first_name} ${formData5.last_name}
+📞 Phone: ${formData5.caller_id}
+📧 Email: ${formData5.email}
+
+⚖️ CASE DETAILS
+────────────────────────────────────────────────────
+📍 Incident State: ${formData5.incidentstate || 'Not provided'}
+📅 Incident Date: ${formData5.incident_date || 'Not provided'}
+👥 Claimant Relationship: ${formData5.claimantrelationship || 'Not provided'}
+🚦 Incident Position: ${formData5.incidentposition || 'Not provided'}
+⚠️ Person at Fault: ${formData5.person_at_fault || 'Not provided'}
+
+🔍 LEGAL STATUS
+────────────────────────────────────────────────────
+👨‍⚖️ Currently Represented: ${formData5.currently_represented || 'Not provided'}
+📝 Cited: ${formData5.cited || 'Not provided'}
+🔄 Change Attorney: ${formData5.changeattorney || 'Not provided'}
+💰 Settlement: ${formData5.settlement || 'Not provided'}
+
+📡 ADDITIONAL INFO
+────────────────────────────────────────────────────
+📢 Channel: ${formData5.channel || 'Not provided'}
+🔗 Trusted Form URL: ${formData5.trusted_form_cert_url || 'Not provided'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Submitted via NexaGen WeCallPro Lead Form 5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          `
+          }),
+        });
+
+        const emailData = await emailResponse.json();
+        setApiResponse5((prev: any) => ({
+          ...prev,
+          email: {
+            status: emailResponse.status,
+            statusText: emailResponse.statusText,
+            data: emailData
+          }
+        }));
+
+        setStatus5("success");
+        setFormData5({
+          caller_id: '',
+          traffic_source_id: '1084',
+          first_name: '',
+          last_name: '',
+          email: '',
+          trusted_form_cert_url: '',
+          currently_represented: '',
+          person_at_fault: '',
+          claimantrelationship: '',
+          incidentstate: '',
+          incident_date: '',
+          incidentposition: '',
+          settlement: '',
+          channel: '',
+          cited: '',
+          changeattorney: ''
+        });
+      } else {
+        // If not 200/201, show error and keep form with data
+        setStatus5("error");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setStatus5("error");
+      setApiResponse5({
+        error: {
+          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          details: error
+        }
+      });
+    }
+  };
+
+  const handleChange5 = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData5({
+      ...formData5,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black py-6 md:py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -724,6 +883,16 @@ Submitted via NexaGen Elite-Calls Lead Form 4
                 }`}
               >
                 Form 4: Elite-Calls
+              </button>
+              <button
+                onClick={() => handleFormChange('form5')}
+                className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  activeForm === 'form5'
+                    ? 'bg-white text-red-600 shadow-lg'
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+              >
+                Form 5: Lead Form
               </button>
             </div>
           </div>
@@ -2339,6 +2508,381 @@ Submitted via NexaGen Elite-Calls Lead Form 4
                     className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {status4 === "loading" ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Submitting Lead...
+                      </span>
+                    ) : (
+                      "Submit Lead"
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {/* Form 5 - Lead Form (686ddbfe...) */}
+          {activeForm === 'form5' && (
+            <div className="p-6 md:p-8">
+              {status5 === "success" ? (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-6">🎉</div>
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+                    Thank You!
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
+                    Your lead has been submitted successfully. We&apos;ll be in touch soon!
+                  </p>
+                  
+                  {/* API Response Display */}
+                  {apiResponse5 && (
+                    <div className="mt-8 text-left bg-gray-50 dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">📊</span>
+                        API Response
+                      </h3>
+                      <pre className="text-sm text-gray-700 dark:text-gray-300 overflow-x-auto bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        {JSON.stringify(apiResponse5, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      setStatus5("idle");
+                      setApiResponse5(null);
+                    }}
+                    className="mt-6 bg-gradient-to-r from-red-600 to-pink-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                  >
+                    Submit Another Lead
+                  </button>
+                </div>
+              ) : status5 === "error" ? (
+                <div className="text-center py-12">
+                  <div className="text-6xl mb-6">❌</div>
+                  <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+                    Submission Error
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
+                    {apiResponse5?.weCallPro?.data?.response?.result?.[0] === "Source Duplicate" 
+                      ? 'Lead creation failed: Duplicate entry detected'
+                      : 'There was an error submitting your form. Please try again.'}
+                  </p>
+
+                  {/* Error Alert Box */}
+                  {apiResponse5?.weCallPro?.data?.response?.result?.[0] && (
+                    <div className="max-w-2xl mx-auto mb-6 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
+                      <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-red-700 dark:text-red-300 text-sm md:text-base font-medium">
+                        {apiResponse5?.weCallPro?.data?.response?.result?.[0] === "Source Duplicate" 
+                          ? "Lead creation failed: Duplicate entry detected" 
+                          : "Something went wrong. Please check the response below."}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* API Response Display */}
+                  {apiResponse5 && (
+                    <div className="mt-8 text-left bg-red-50 dark:bg-red-900/20 p-6 rounded-xl border border-red-200 dark:border-red-800">
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                        <span className="text-2xl">⚠️</span>
+                        Error Details
+                      </h3>
+                      <pre className="text-sm text-gray-700 dark:text-gray-300 overflow-x-auto bg-white dark:bg-gray-800 p-4 rounded-lg border border-red-200 dark:border-red-700">
+                        {JSON.stringify(apiResponse5, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      setStatus5("idle");
+                      setApiResponse5(null);
+                    }}
+                    className="mt-6 bg-gradient-to-r from-red-600 to-pink-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit5} className="space-y-6">
+                  {/* Caller ID */}
+                  <div>
+                    <label htmlFor="caller_id_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Caller Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="caller_id_5"
+                      name="caller_id"
+                      value={formData5.caller_id}
+                      onChange={handleChange5}
+                      placeholder="+17194451111"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* First Name */}
+                  <div>
+                    <label htmlFor="first_name_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      First Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="first_name_5"
+                      name="first_name"
+                      value={formData5.first_name}
+                      onChange={handleChange5}
+                      placeholder="John"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Last Name */}
+                  <div>
+                    <label htmlFor="last_name_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Last Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="last_name_5"
+                      name="last_name"
+                      value={formData5.last_name}
+                      onChange={handleChange5}
+                      placeholder="Smith"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label htmlFor="email_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      id="email_5"
+                      name="email"
+                      value={formData5.email}
+                      onChange={handleChange5}
+                      placeholder="first-and-last-name@gmail.com"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Trusted Form URL */}
+                  <div>
+                    <label htmlFor="trusted_form_cert_url_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Trusted Form URL <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="trusted_form_cert_url_5"
+                      name="trusted_form_cert_url"
+                      value={formData5.trusted_form_cert_url}
+                      onChange={handleChange5}
+                      placeholder="https://..."
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Currently Represented */}
+                  <div>
+                    <label htmlFor="currently_represented_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Already Represented? <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="currently_represented_5"
+                      name="currently_represented"
+                      value={formData5.currently_represented}
+                      onChange={handleChange5}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    >
+                      <option value="">Select...</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Person at Fault */}
+                  <div>
+                    <label htmlFor="person_at_fault_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Person at Fault <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="person_at_fault_5"
+                      name="person_at_fault"
+                      value={formData5.person_at_fault}
+                      onChange={handleChange5}
+                      placeholder="Example"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Claimant Relationship */}
+                  <div>
+                    <label htmlFor="claimantrelationship_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Claimant Relationship <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="claimantrelationship_5"
+                      name="claimantrelationship"
+                      value={formData5.claimantrelationship}
+                      onChange={handleChange5}
+                      placeholder="Example"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Incident State */}
+                  <div>
+                    <label htmlFor="incidentstate_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Incident State <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="incidentstate_5"
+                      name="incidentstate"
+                      value={formData5.incidentstate}
+                      onChange={handleChange5}
+                      placeholder="e.g., NC"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Incident Date */}
+                  <div>
+                    <label htmlFor="incident_date_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Incident Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      id="incident_date_5"
+                      name="incident_date"
+                      value={formData5.incident_date}
+                      onChange={handleChange5}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Incident Position */}
+                  <div>
+                    <label htmlFor="incidentposition_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Incident Position <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="incidentposition_5"
+                      name="incidentposition"
+                      value={formData5.incidentposition}
+                      onChange={handleChange5}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    >
+                      <option value="">Select...</option>
+                      <option value="Driver">Driver</option>
+                      <option value="Passenger">Passenger</option>
+                      <option value="Pedestrian">Pedestrian</option>
+                    </select>
+                  </div>
+
+                  {/* Settlement */}
+                  <div>
+                    <label htmlFor="settlement_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Settlement <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="settlement_5"
+                      name="settlement"
+                      value={formData5.settlement}
+                      onChange={handleChange5}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    >
+                      <option value="">Select...</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Channel */}
+                  <div>
+                    <label htmlFor="channel_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Channel <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="channel_5"
+                      name="channel"
+                      value={formData5.channel}
+                      onChange={handleChange5}
+                      placeholder="Example"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    />
+                  </div>
+
+                  {/* Cited */}
+                  <div>
+                    <label htmlFor="cited_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Cited <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="cited_5"
+                      name="cited"
+                      value={formData5.cited}
+                      onChange={handleChange5}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    >
+                      <option value="">Select...</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Change Attorney */}
+                  <div>
+                    <label htmlFor="changeattorney_5" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Change Attorney <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="changeattorney_5"
+                      name="changeattorney"
+                      value={formData5.changeattorney}
+                      onChange={handleChange5}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-300"
+                    >
+                      <option value="">Select...</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={status5 === "loading"}
+                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    {status5 === "loading" ? (
                       <span className="flex items-center justify-center gap-2">
                         <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
